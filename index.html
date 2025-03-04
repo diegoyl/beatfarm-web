@@ -1,0 +1,356 @@
+<!--
+Copyright 2011, Google Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <title>Beatfarm Web Version</title>
+
+    <link rel="stylesheet" type="text/css" href = "style/drummachine.css" />
+
+    <script src="https://cwilso.github.io/AudioContext-MonkeyPatch/AudioContextMonkeyPatch.js"></script>
+
+    <!-- Set up Web MIDI polyfill -->
+    <script type="text/javascript" src="js/WebMIDIAPI.js"></script>
+
+    <script type="text/javascript" src="js/midi.js"></script>
+    <script type="text/javascript" src="js/diego_imports.js"></script>
+    <script type="text/javascript" src="js/drummachine.js"></script>
+</head>
+
+
+<!-- Preload some important UI elements -->
+<img class="preload" src='img/fadein-logo.png'>
+<img class="preload" src='images/LED_on.png'>
+
+<!--  The markup below keeps all images in a row on a single long line to avoid 
+            a bizarre bug where otherwise the browser inserts an extra pixel between 
+            the images.  The cost of perfectionism :O{
+-->
+
+<body id='body'>
+    <div id="fadein-container" class="fadeinContainer">
+        <img id='fadein-logo' src='img/fadein-logo.png'>
+    </div>
+
+<div id="realBody" class="hideUntilReady"> 
+     
+    <!-- TRACK CONTROL BOXES SECTIOn  -->
+    <section class='container active' id='master-controls'>
+        <div class="mc-buttons mc-third">
+            <div id="startAlert" class="startAlert">Start Playing →</div>
+            <img id='play' class='mc-button' src='img/btn_loading.gif'>
+            <img id='stop' class='mc-button' src='img/btn_pause.png'>
+            <img id='master_' onclick="pageRedirect('sample.html')" class='mc-button' src='img/btn_rec.png'>
+            <img id='master_' onclick="pageRedirect('launchpad.html')" class='mc-button' src='img/btn_fs.png'>
+        </div>
+
+        <div class="mc-third mc-centerthird">
+            <img id="main-logo" class='' src='img/logo.png'>
+        </div>
+
+        <div class="mc-sliders mc-third">
+            
+            <div class="mc-slider mc-volume cb-slider">
+                <div class="cb-slider-labeldiv" >
+                    <h2>VOL</h2>
+                    <input oninput="handleSlider('master','volume')" type="range" min="0" max="127" value="70" step="1" class="slider" id="volume_master">
+                    <h2 id="master-volumelabel" >70</h2>
+                </div>
+            </div>
+
+
+            <div class="mc-slider mc-tempo cb-slider">
+                <div class="cb-slider-labeldiv" >
+                    <h2>BPM</h2>
+                    <input oninput="handleSlider('master','tempo')" type="range" min="53" max="180" value="100" step="1" class="slider" id="tempo_master">
+                    <h2 id="master-tempolabel" >80</h2>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <section class='container active' id='track-controls'>
+        <div id="cb_kick" class="control-box" style="--trackColor:var(--trackColor-kick)">
+            <div class="cb-header"><h1 class="cb-trackname">KICK</h1><img id='kick_mute' onclick="handleMuteBtn('kick')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+            <div class="dropdown cb-style cb-pill">
+                <div id="dd_kick" class="dropdown-button" onclick="toggleDropdown('kick')"><h2 id="kick_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_kick">
+                    <p onclick="handleStyleSelection('kick','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('kick','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('kick','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('kick','neptunes')">Neptunes</p>
+                </div>
+            </div>
+
+            <div class="cb-sampletype cb-pill">
+                <label><h2 id="kick-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('kick', 'sampletype', 1)" type="radio" checked=true name="sampletype_kick" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="kick-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('kick', 'sampletype', 2)" type="radio" name="sampletype_kick" class="radioBoxLast" value="organic"></label>
+            </div>
+
+            <div class="cb-complexity cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
+                <div class="cb-complexity-radio">
+                    <label><p id="kick-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('kick', 'complexity', 1)" type="radio" checked=true name="complexity_kick" class="radioBoxFirst" value="1"></label>
+                    <label><p id="kick-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('kick', 'complexity', 2)" type="radio" name="complexity_kick" class="" value="2"></label>
+                    <label><p id="kick-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('kick', 'complexity', 3)" type="radio" name="complexity_kick" class="" value="3"></label>
+                    <label><p id="kick-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('kick', 'complexity', 4)" type="radio" name="complexity_kick" class="radioBoxLast" value="4"></label>
+                </div>
+            </div>
+
+            <div class="cb-volume cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="kick-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('kick')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_kick">
+            </div>
+        </div>
+
+        <!-- END KICK ///////////////////////////////// -->
+
+        <div id="cb_snare" class="control-box" style="--trackColor:var(--trackColor-snare)">
+            <div class="cb-header"><h1 class="cb-trackname">SNARE</h1><img id='snare_mute' onclick="handleMuteBtn('snare')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+            <div class="dropdown cb-style cb-pill">
+                <div id="dd_snare" class="dropdown-button" onclick="toggleDropdown('snare')"><h2 id="snare_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_snare">
+                    <p onclick="handleStyleSelection('snare','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('snare','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('snare','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('snare','neptunes')">Neptunes</p>
+                </div>
+            </div>
+
+            <div class="cb-sampletype cb-pill">
+                <label><h2 id="snare-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('snare', 'sampletype', 1)" type="radio" checked=true name="sampletype_snare" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="snare-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('snare', 'sampletype', 2)" type="radio" name="sampletype_snare" class="radioBoxLast" value="organic"></label>
+            </div>
+
+            <div class="cb-complexity cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
+                <div class="cb-complexity-radio">
+                    <label><p id="snare-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('snare', 'complexity', 1)" type="radio" checked=true name="complexity_snare" class="radioBoxFirst" value="1"></label>
+                    <label><p id="snare-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('snare', 'complexity', 2)" type="radio" name="complexity_snare" class="" value="2"></label>
+                    <label><p id="snare-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('snare', 'complexity', 3)" type="radio" name="complexity_snare" class="" value="3"></label>
+                    <label><p id="snare-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('snare', 'complexity', 4)" type="radio" name="complexity_snare" class="radioBoxLast" value="4"></label>
+                </div>
+            </div>
+
+            <div class="cb-volume cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="snare-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('snare')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_snare">
+            </div>
+        </div>
+
+        <!-- END SNARE ///////////////////////////////// -->
+
+        <div id="cb_hihat" class="control-box" style="--trackColor:var(--trackColor-hihat)">
+            <div class="cb-header"><h1 class="cb-trackname">HI-HAT</h1><img id='hihat_mute' onclick="handleMuteBtn('hihat')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+            <div class="dropdown cb-style cb-pill">
+                <div id="dd_hihat" class="dropdown-button" onclick="toggleDropdown('hihat')"><h2 id="hihat_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_hihat">
+                    <p onclick="handleStyleSelection('hihat','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('hihat','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('hihat','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('hihat','neptunes')">Neptunes</p>
+                </div>
+            </div>
+
+            <div class="cb-sampletype cb-pill">
+                <label><h2 id="hihat-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('hihat', 'sampletype', 1)" type="radio" checked=true name="sampletype_hihat" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="hihat-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('hihat', 'sampletype', 2)" type="radio" name="sampletype_hihat" class="radioBoxLast" value="organic"></label>
+            </div>
+
+            <div class="cb-complexity cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
+                <div class="cb-complexity-radio">
+                    <label><p id="hihat-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('hihat', 'complexity', 1)" type="radio" checked=true name="complexity_hihat" class="radioBoxFirst" value="1"></label>
+                    <label><p id="hihat-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('hihat', 'complexity', 2)" type="radio" name="complexity_hihat" class="" value="2"></label>
+                    <label><p id="hihat-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('hihat', 'complexity', 3)" type="radio" name="complexity_hihat" class="" value="3"></label>
+                    <label><p id="hihat-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('hihat', 'complexity', 4)" type="radio" name="complexity_hihat" class="radioBoxLast" value="4"></label>
+                </div>
+            </div>
+
+            <div class="cb-volume cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="hihat-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('hihat')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_hihat">
+            </div>
+        </div>
+
+        <!-- END HIHAT ///////////////////////////////// -->
+
+        <div id="cb_brass" class="control-box" style="--trackColor:var(--trackColor-brass)">
+            <div class="cb-header"><h1 class="cb-trackname">BRASS</h1><img id='brass_mute' onclick="handleMuteBtn('brass')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+            <div class="dropdown cb-style cb-pill">
+                <div id="dd_brass" class="dropdown-button" onclick="toggleDropdown('brass')"><h2 id="brass_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_brass">
+                    <p onclick="handleStyleSelection('brass','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('brass','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('brass','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('brass','neptunes')">Neptunes</p>
+                </div>
+            </div>
+
+            <div class="cb-sampletype cb-pill">
+                <label><h2 id="brass-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('brass', 'sampletype', 1)" type="radio" checked=true name="sampletype_brass" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="brass-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('brass', 'sampletype', 2)" type="radio" name="sampletype_brass" class="radioBoxLast" value="organic"></label>
+            </div>
+
+            <div class="cb-complexity cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
+                <div class="cb-complexity-radio">
+                    <label><p id="brass-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('brass', 'complexity', 1)" type="radio" checked=true name="complexity_brass" class="radioBoxFirst" value="1"></label>
+                    <label><p id="brass-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('brass', 'complexity', 2)" type="radio" name="complexity_brass" class="" value="2"></label>
+                    <label><p id="brass-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('brass', 'complexity', 3)" type="radio" name="complexity_brass" class="" value="3"></label>
+                    <label><p id="brass-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('brass', 'complexity', 4)" type="radio" name="complexity_brass" class="radioBoxLast" value="4"></label>
+                </div>
+            </div>
+
+            <div class="cb-volume cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="brass-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('brass')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_brass">
+            </div>
+        </div>
+
+        <!-- END BRASS ///////////////////////////////// -->
+
+        <div id="cb_synth" class="control-box" style="--trackColor:var(--trackColor-synth)">
+            <div class="cb-header"><h1 class="cb-trackname">SYNTH</h1><img id='synth_mute' onclick="handleMuteBtn('synth')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+            <div class="dropdown cb-style cb-pill">
+                <div id="dd_synth" class="dropdown-button" onclick="toggleDropdown('synth')"><h2 id="synth_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_synth">
+                    <p onclick="handleStyleSelection('synth','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('synth','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('synth','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('synth','neptunes')">Neptunes</p>
+                </div>
+            </div>
+
+            <div class="cb-sampletype cb-pill">
+                <label><h2 id="synth-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('synth', 'sampletype', 1)" type="radio" checked=true name="sampletype_synth" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="synth-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('synth', 'sampletype', 2)" type="radio" name="sampletype_synth" class="radioBoxLast" value="organic"></label>
+            </div>
+
+            <div class="cb-complexity cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
+                <div class="cb-complexity-radio">
+                    <label><p id="synth-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('synth', 'complexity', 1)" type="radio" checked=true name="complexity_synth" class="radioBoxFirst" value="1"></label>
+                    <label><p id="synth-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('synth', 'complexity', 2)" type="radio" name="complexity_synth" class="" value="2"></label>
+                    <label><p id="synth-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('synth', 'complexity', 3)" type="radio" name="complexity_synth" class="" value="3"></label>
+                    <label><p id="synth-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('synth', 'complexity', 4)" type="radio" name="complexity_synth" class="radioBoxLast" value="4"></label>
+                </div>
+            </div>
+
+            <div class="cb-volume cb-slider">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="synth-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('synth')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_synth">
+            </div>
+        </div>
+
+        <!-- END SYNTH ///////////////////////////////// -->
+
+    </section>
+
+    <section class='container active' id='pad'>
+
+        <div id="beet-pad">
+            <div class="beet-row" style="--beetSize:50%; --trackColor:var(--trackColor-kick);">
+                <div id="Kick_0"></div><div id="Kick_1"></div><div id="Kick_2"></div><div id="Kick_3"></div><div id="Kick_4"></div><div id="Kick_5"></div><div id="Kick_6"></div><div id="Kick_7"></div><div id="Kick_8"></div><div id="Kick_9"></div><div id="Kick_10"></div><div id="Kick_11"></div><div id="Kick_12"></div><div id="Kick_13"></div><div id="Kick_14"></div><div id="Kick_15"></div>
+            </div>
+
+            <div class="beet-row" style="--beetSize:40%; --trackColor:var(--trackColor-snare);">
+                <div id="Snare_0"></div><div id="Snare_1"></div><div id="Snare_2"></div><div id="Snare_3"></div><div id="Snare_4"></div><div id="Snare_5"></div><div id="Snare_6"></div><div id="Snare_7"></div><div id="Snare_8"></div><div id="Snare_9"></div><div id="Snare_10"></div><div id="Snare_11"></div><div id="Snare_12"></div><div id="Snare_13"></div><div id="Snare_14"></div><div id="Snare_15"></div>
+            </div>
+
+            <div class="beet-row" style="--beetSize:33%; --trackColor:var(--trackColor-hihat);">
+                <div id="HiHat_0"></div><div id="HiHat_1"></div><div id="HiHat_2"></div><div id="HiHat_3"></div><div id="HiHat_4"></div><div id="HiHat_5"></div><div id="HiHat_6"></div><div id="HiHat_7"></div><div id="HiHat_8"></div><div id="HiHat_9"></div><div id="HiHat_10"></div><div id="HiHat_11"></div><div id="HiHat_12"></div><div id="HiHat_13"></div><div id="HiHat_14"></div><div id="HiHat_15"></div>
+            </div>
+
+            <div class="beet-row" style="--beetSize:26%; --trackColor:var(--trackColor-brass);">
+                <div id="Brass_0"></div><div id="Brass_1"></div><div id="Brass_2"></div><div id="Brass_3"></div><div id="Brass_4"></div><div id="Brass_5"></div><div id="Brass_6"></div><div id="Brass_7"></div><div id="Brass_8"></div><div id="Brass_9"></div><div id="Brass_10"></div><div id="Brass_11"></div><div id="Brass_12"></div><div id="Brass_13"></div><div id="Brass_14"></div><div id="Brass_15"></div>
+            </div>
+
+            <div class="beet-row" style="--beetSize:20%; --trackColor:var(--trackColor-synth);">
+                <div id="Synth_0"></div><div id="Synth_1"></div><div id="Synth_2"></div><div id="Synth_3"></div><div id="Synth_4"></div><div id="Synth_5"></div><div id="Synth_6"></div><div id="Synth_7"></div><div id="Synth_8"></div><div id="Synth_9"></div><div id="Synth_10"></div><div id="Synth_11"></div><div id="Synth_12"></div><div id="Synth_13"></div><div id="Synth_14"></div><div id="Synth_15"></div>
+            </div>
+
+
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:0"><img id='rake' class="rake" src='img/rake.png'></div>
+            <!-- <div id="rakeContainer" class="rakeContainer" style="--leftPos:1"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:2"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:3"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:4"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:5"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:6"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:7"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:8"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:9"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:10"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:11"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:12"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:13"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:14"><img id='rake' class="rake" src='img/rake.png'></div>
+            <div id="rakeContainer" class="rakeContainer" style="--leftPos:15"><img id='rake' class="rake" src='img/rake.png'></div> -->
+        </div>
+
+        
+
+        <!-- LEDs -->
+        <!-- <div class='buttons_row' id='LED_row'>
+            <span class='label'></span>
+            <img id='LED_0' src='images/LED_off.png'><img id='LED_1' src='images/LED_off.png'><img id='LED_2' src='images/LED_off.png'><img id='LED_3' src='images/LED_off.png'><img id='LED_4' src='images/LED_off.png'><img id='LED_5' src='images/LED_off.png'><img id='LED_6' src='images/LED_off.png'><img id='LED_7' src='images/LED_off.png'><img id='LED_8' src='images/LED_off.png'><img id='LED_9' src='images/LED_off.png'><img id='LED_10' src='images/LED_off.png'><img id='LED_11' src='images/LED_off.png'><img id='LED_12' src='images/LED_off.png'><img id='LED_13' src='images/LED_off.png'><img id='LED_14' src='images/LED_off.png'><img id='LED_15' src='images/LED_off.png'>
+        </div> -->
+
+    </section>
+
+</div> 
+<!-- END OF REAL BODY -->
+
+
+
+<div id="MIDIPlugin"> </div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-35593052-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>
