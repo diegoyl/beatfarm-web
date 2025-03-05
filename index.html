@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="description" content="">
     <title>Beatfarm Web Version</title>
+    <link rel="icon" type="image/png" href="./favicon.ico">
 
     <link rel="stylesheet" type="text/css" href = "style/drummachine.css" />
 
@@ -62,6 +63,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <div id="fadein-container" class="fadeinContainer">
         <img id='fadein-logo' src='img/fadein-logo.png'>
     </div>
+
+    <div id="mobileWarning" class=""mobileWarning>
+        <h1>! ! !<br>This does not work on mobile :(</h1>
+        <h2>If you are not on mobile, but seeing this, then try making your window wider!</h2>
+    </div>
+
+    <img id='info_btn' onclick="handleInfo(true)" src='img/btn_info.png'>
+    <div id="info_overlay" class='info_overlay fadeOut'>
+        <div id="info_content">
+            <p id="info_x" onclick="handleInfo(false)">X</p>
+            <br>
+            <br>
+            <br>
+            <h2>ABOUT</h2>
+            <p><span style="color:var(--c-pink)">Beatfarm</span> is a hip-hop beat-making app where you can easily generate or modify beats, learn about different hip-hop styles, and even create your own samples!</p>
+            <br>
+
+
+            <h2>CREATED BY</h2>
+            <p>Lucy Kim  /  Collin Wen  /  Diego Yañez-Laguna</p>
+            <br>
+
+
+
+            <h2>OTHER CREDITS</h2>
+            <p><span style="color:var(--c-pink)">Beatfarm</span> was originally created as a Kivy app. To create this web-accessible version, the <a href="https://github.com/cwilso/MIDIDrums" target="_blank" style="color:var(--c-green)">MIDIDrums</a> step-sequencer library was used, which provides similar functionalities to those that were created for the original app.</p>
+            <br>
+            <br>
+
+
+        </div>
+        
+    </div>
+
+
 
 <div id="realBody" class="hideUntilReady"> 
      

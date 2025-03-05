@@ -1439,3 +1439,11 @@ InstrumentSamples.prototype.loadSample = function(sampleID, url, mixToMono) {
 function pageRedirect(page) {
     window.location.href = page; 
 }
+
+function handleInfo(showInfo) {
+    if (showInfo) {
+        document.getElementById('info_overlay').classList.remove('fadeOut');
+    } else {
+        document.getElementById('info_overlay').classList.add('fadeOut');
+    }
+}
