@@ -70,9 +70,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </div>
 
     <img id='info_btn' onclick="handleInfo(true)" src='img/btn_info.png'>
+    <!-- <img id='keycuts_btn' onclick="handleKeycutsInfo(true)" src='img/btn_keycuts.png'> -->
     <div id="info_overlay" class='info_overlay fadeOut'>
         <div id="info_content">
-            <p id="info_x" onclick="handleInfo(false)">X</p>
+            <p id="info_x" class="info_x" onclick="handleInfo(false)">X</p>
             <br>
             <br>
             <br>
@@ -86,9 +87,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <br>
 
 
+            <h2 >EXTRA CONTROLS</h2>
+            <p>There are keyboard shortcuts for muting tracks and playing individual drum hits.</p>
+            <div style="text-align: left; width: 70%; margin: 20px auto;">
+                <span class="key space">SPACE</span><span class="txt">play / stop</span>
+                <br>
+                <span class="key">Q</span><span class="txt">plays synth note</span>
+                <br>
+                <span class="key">W</span><span class="txt">plays snare note</span>
+                <br>
+                <span class="key">E</span><span class="txt">plays hihat note</span>
+                <br>
+                <span class="key">1</span>
+                <span class="key">2</span>
+                <span class="key">3</span>
+                <span class="key">4</span>
+                <span class="key">5</span>
+                <span class="txt">toggles mute for each track</span>
+            </div>
+            <p>You can also draw in notes in the bottom section by clicking on an empty space (you can also remove an existing note by clicking on it)</p>
+            <br>
+
 
             <h2>OTHER CREDITS</h2>
             <p><span style="color:var(--c-pink)">Beatfarm</span> was originally created as a Kivy app. To create this web-accessible version, the <a href="https://github.com/cwilso/MIDIDrums" target="_blank" style="color:var(--c-green)">MIDIDrums</a> step-sequencer library was used, which provides similar functionalities to those that were created for the original app.</p>
+            <br>
+            <br>
+            <br>
+            <p id="info_x" class="info_x info_x2" onclick="handleInfo(false)">BACK</p>
+            <br>
+            <br>
             <br>
             <br>
 
@@ -102,6 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div id="realBody" class="hideUntilReady"> 
      
     <!-- TRACK CONTROL BOXES SECTIOn  -->
+
     <section class='container active' id='master-controls'>
         <div class="mc-buttons mc-third">
             <div id="startAlert" class="startAlert">Start Playing →</div>
@@ -120,8 +149,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div class="mc-slider mc-volume cb-slider">
                 <div class="cb-slider-labeldiv" >
                     <h2>VOL</h2>
-                    <input oninput="handleSlider('master','volume')" type="range" min="0" max="127" value="70" step="1" class="slider" id="volume_master">
-                    <h2 id="master-volumelabel" >70</h2>
+                    <input oninput="handleSlider('master','volume')" type="range" min="0" max="127" value="80" step="1" class="slider" id="volume_master">
+                    <h2 id="master-volumelabel" >80</h2>
                 </div>
             </div>
 
@@ -129,8 +158,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div class="mc-slider mc-tempo cb-slider">
                 <div class="cb-slider-labeldiv" >
                     <h2>BPM</h2>
-                    <input oninput="handleSlider('master','tempo')" type="range" min="53" max="180" value="100" step="1" class="slider" id="tempo_master">
-                    <h2 id="master-tempolabel" >80</h2>
+                    <input oninput="handleSlider('master','tempo')" type="range" min="40" max="150" value="90" step="1" class="slider" id="tempo_master">
+                    <h2 id="master-tempolabel" >90</h2>
                 </div>
             </div>
         </div>
@@ -244,40 +273,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         <!-- END HIHAT ///////////////////////////////// -->
 
-        <div id="cb_brass" class="control-box" style="--trackColor:var(--trackColor-brass)">
-            <div class="cb-header"><h1 class="cb-trackname">BRASS</h1><img id='brass_mute' onclick="handleMuteBtn('brass')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
+        <div id="cb_bass" class="control-box" style="--trackColor:var(--trackColor-bass)">
+            <div class="cb-header"><h1 class="cb-trackname">BASS</h1><img id='bass_mute' onclick="handleMuteBtn('bass')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
             <div class="dropdown cb-style cb-pill">
-                <div id="dd_brass" class="dropdown-button" onclick="toggleDropdown('brass')"><h2 id="brass_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
-                <div class="dropdown-menu" id="dropdownMenu_brass">
-                    <p onclick="handleStyleSelection('brass','boombap')">Boom-Bap</p>
-                    <p onclick="handleStyleSelection('brass','westcoast')">West Coast</p>
-                    <p onclick="handleStyleSelection('brass','trap')">Trap</p>
-                    <p onclick="handleStyleSelection('brass','neptunes')">Neptunes</p>
+                <div id="dd_bass" class="dropdown-button" onclick="toggleDropdown('bass')"><h2 id="bass_ddlabel">Boom-Bap</h2><h2 id="ddArrow">▼</h2></div>
+                <div class="dropdown-menu" id="dropdownMenu_bass">
+                    <p onclick="handleStyleSelection('bass','boombap')">Boom-Bap</p>
+                    <p onclick="handleStyleSelection('bass','westcoast')">West Coast</p>
+                    <p onclick="handleStyleSelection('bass','trap')">Trap</p>
+                    <p onclick="handleStyleSelection('bass','neptunes')">Neptunes</p>
                 </div>
             </div>
 
             <div class="cb-sampletype cb-pill">
-                <label><h2 id="brass-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('brass', 'sampletype', 1)" type="radio" checked=true name="sampletype_brass" class="radioBoxFirst" value="generic"></label>
-                <label><h2 id="brass-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('brass', 'sampletype', 2)" type="radio" name="sampletype_brass" class="radioBoxLast" value="organic"></label>
+                <label><h2 id="bass-sampletype-1" class="activeRadio radioInnerLabel cb-generic-label">GENERIC</h2><input onclick="handleRadio('bass', 'sampletype', 1)" type="radio" checked=true name="sampletype_bass" class="radioBoxFirst" value="generic"></label>
+                <label><h2 id="bass-sampletype-2" class="radioInnerLabel">ORGANIC</h2><input onclick="handleRadio('bass', 'sampletype', 2)" type="radio" name="sampletype_bass" class="radioBoxLast" value="organic"></label>
             </div>
 
             <div class="cb-complexity cb-slider">
                 <div class="cb-slider-labeldiv" ><h2>COMPLEXITY</h2></div>
                 <div class="cb-complexity-radio">
-                    <label><p id="brass-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('brass', 'complexity', 1)" type="radio" checked=true name="complexity_brass" class="radioBoxFirst" value="1"></label>
-                    <label><p id="brass-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('brass', 'complexity', 2)" type="radio" name="complexity_brass" class="" value="2"></label>
-                    <label><p id="brass-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('brass', 'complexity', 3)" type="radio" name="complexity_brass" class="" value="3"></label>
-                    <label><p id="brass-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('brass', 'complexity', 4)" type="radio" name="complexity_brass" class="radioBoxLast" value="4"></label>
+                    <label><p id="bass-complexity-1" class="activeRadio radioInnerLabel">1</p><input onclick="handleRadio('bass', 'complexity', 1)" type="radio" checked=true name="complexity_bass" class="radioBoxFirst" value="1"></label>
+                    <label><p id="bass-complexity-2" class="radioInnerLabel">2</p><input onclick="handleRadio('bass', 'complexity', 2)" type="radio" name="complexity_bass" class="" value="2"></label>
+                    <label><p id="bass-complexity-3" class="radioInnerLabel">3</p><input onclick="handleRadio('bass', 'complexity', 3)" type="radio" name="complexity_bass" class="" value="3"></label>
+                    <label><p id="bass-complexity-4" class="radioInnerLabel">4</p><input onclick="handleRadio('bass', 'complexity', 4)" type="radio" name="complexity_bass" class="radioBoxLast" value="4"></label>
                 </div>
             </div>
 
             <div class="cb-volume cb-slider">
-                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="brass-volumelabel" >80</h2></div>
-                <input oninput="handleSlider('brass')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_brass">
+                <div class="cb-slider-labeldiv" ><h2>VOL</h2><h2 id="bass-volumelabel" >80</h2></div>
+                <input oninput="handleSlider('bass')" type="range" min="0" max="100" value="80" step="1" class="slider" id="volume_bass">
             </div>
         </div>
 
-        <!-- END BRASS ///////////////////////////////// -->
+        <!-- END BASS ///////////////////////////////// -->
 
         <div id="cb_synth" class="control-box" style="--trackColor:var(--trackColor-synth)">
             <div class="cb-header"><h1 class="cb-trackname">SYNTH</h1><img id='synth_mute' onclick="handleMuteBtn('synth')" class='muteButton xxxbtn' src='img/btn_trackunmuted.png'></div>
@@ -319,24 +348,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <section class='container active' id='pad'>
 
         <div id="beet-pad">
-            <div class="beet-row" style="--beetSize:50%; --trackColor:var(--trackColor-kick);">
-                <div id="Kick_0"></div><div id="Kick_1"></div><div id="Kick_2"></div><div id="Kick_3"></div><div id="Kick_4"></div><div id="Kick_5"></div><div id="Kick_6"></div><div id="Kick_7"></div><div id="Kick_8"></div><div id="Kick_9"></div><div id="Kick_10"></div><div id="Kick_11"></div><div id="Kick_12"></div><div id="Kick_13"></div><div id="Kick_14"></div><div id="Kick_15"></div>
+            <div id="br_kick" class="beet-row" style="--beetSize:50%; --trackColor:var(--trackColor-kick);">
+                <div id="Kick_0"></div><div id="Kick_1"></div><div id="Kick_2"></div><div id="Kick_3"></div><div id="Kick_4"></div><div id="Kick_5"></div><div id="Kick_6"></div><div id="Kick_7"></div><div id="Kick_8"></div><div id="Kick_9"></div><div id="Kick_10"></div><div id="Kick_11"></div><div id="Kick_12"></div><div id="Kick_13"></div><div id="Kick_14"></div><div id="Kick_15"></div><div id="Kick_16"></div><div id="Kick_17"></div><div id="Kick_18"></div><div id="Kick_19"></div><div id="Kick_20"></div><div id="Kick_21"></div><div id="Kick_22"></div><div id="Kick_23"></div><div id="Kick_24"></div><div id="Kick_25"></div><div id="Kick_26"></div><div id="Kick_27"></div><div id="Kick_28"></div><div id="Kick_29"></div><div id="Kick_30"></div><div id="Kick_31"></div>
             </div>
 
-            <div class="beet-row" style="--beetSize:40%; --trackColor:var(--trackColor-snare);">
-                <div id="Snare_0"></div><div id="Snare_1"></div><div id="Snare_2"></div><div id="Snare_3"></div><div id="Snare_4"></div><div id="Snare_5"></div><div id="Snare_6"></div><div id="Snare_7"></div><div id="Snare_8"></div><div id="Snare_9"></div><div id="Snare_10"></div><div id="Snare_11"></div><div id="Snare_12"></div><div id="Snare_13"></div><div id="Snare_14"></div><div id="Snare_15"></div>
+            <div id="br_snare" class="beet-row" style="--beetSize:40%; --trackColor:var(--trackColor-snare);">
+                <div id="Snare_0"></div><div id="Snare_1"></div><div id="Snare_2"></div><div id="Snare_3"></div><div id="Snare_4"></div><div id="Snare_5"></div><div id="Snare_6"></div><div id="Snare_7"></div><div id="Snare_8"></div><div id="Snare_9"></div><div id="Snare_10"></div><div id="Snare_11"></div><div id="Snare_12"></div><div id="Snare_13"></div><div id="Snare_14"></div><div id="Snare_15"></div><div id="Snare_16"></div><div id="Snare_17"></div><div id="Snare_18"></div><div id="Snare_19"></div><div id="Snare_20"></div><div id="Snare_21"></div><div id="Snare_22"></div><div id="Snare_23"></div><div id="Snare_24"></div><div id="Snare_25"></div><div id="Snare_26"></div><div id="Snare_27"></div><div id="Snare_28"></div><div id="Snare_29"></div><div id="Snare_30"></div><div id="Snare_31"></div>
             </div>
 
-            <div class="beet-row" style="--beetSize:33%; --trackColor:var(--trackColor-hihat);">
-                <div id="HiHat_0"></div><div id="HiHat_1"></div><div id="HiHat_2"></div><div id="HiHat_3"></div><div id="HiHat_4"></div><div id="HiHat_5"></div><div id="HiHat_6"></div><div id="HiHat_7"></div><div id="HiHat_8"></div><div id="HiHat_9"></div><div id="HiHat_10"></div><div id="HiHat_11"></div><div id="HiHat_12"></div><div id="HiHat_13"></div><div id="HiHat_14"></div><div id="HiHat_15"></div>
+            <div id="br_hihat" class="beet-row" style="--beetSize:33%; --trackColor:var(--trackColor-hihat);">
+                <div id="HiHat_0"></div><div id="HiHat_1"></div><div id="HiHat_2"></div><div id="HiHat_3"></div><div id="HiHat_4"></div><div id="HiHat_5"></div><div id="HiHat_6"></div><div id="HiHat_7"></div><div id="HiHat_8"></div><div id="HiHat_9"></div><div id="HiHat_10"></div><div id="HiHat_11"></div><div id="HiHat_12"></div><div id="HiHat_13"></div><div id="HiHat_14"></div><div id="HiHat_15"></div><div id="HiHat_16"></div><div id="HiHat_17"></div><div id="HiHat_18"></div><div id="HiHat_19"></div><div id="HiHat_20"></div><div id="HiHat_21"></div><div id="HiHat_22"></div><div id="HiHat_23"></div><div id="HiHat_24"></div><div id="HiHat_25"></div><div id="HiHat_26"></div><div id="HiHat_27"></div><div id="HiHat_28"></div><div id="HiHat_29"></div><div id="HiHat_30"></div><div id="HiHat_31"></div>
             </div>
 
-            <div class="beet-row" style="--beetSize:26%; --trackColor:var(--trackColor-brass);">
-                <div id="Brass_0"></div><div id="Brass_1"></div><div id="Brass_2"></div><div id="Brass_3"></div><div id="Brass_4"></div><div id="Brass_5"></div><div id="Brass_6"></div><div id="Brass_7"></div><div id="Brass_8"></div><div id="Brass_9"></div><div id="Brass_10"></div><div id="Brass_11"></div><div id="Brass_12"></div><div id="Brass_13"></div><div id="Brass_14"></div><div id="Brass_15"></div>
+            <div id="br_bass" class="beet-row" style="--beetSize:26%; --trackColor:var(--trackColor-bass);">
+                <div id="Bass_0"></div><div id="Bass_1"></div><div id="Bass_2"></div><div id="Bass_3"></div><div id="Bass_4"></div><div id="Bass_5"></div><div id="Bass_6"></div><div id="Bass_7"></div><div id="Bass_8"></div><div id="Bass_9"></div><div id="Bass_10"></div><div id="Bass_11"></div><div id="Bass_12"></div><div id="Bass_13"></div><div id="Bass_14"></div><div id="Bass_15"></div><div id="Bass_16"></div><div id="Bass_17"></div><div id="Bass_18"></div><div id="Bass_19"></div><div id="Bass_20"></div><div id="Bass_21"></div><div id="Bass_22"></div><div id="Bass_23"></div><div id="Bass_24"></div><div id="Bass_25"></div><div id="Bass_26"></div><div id="Bass_27"></div><div id="Bass_28"></div><div id="Bass_29"></div><div id="Bass_30"></div><div id="Bass_31"></div>
             </div>
 
-            <div class="beet-row" style="--beetSize:20%; --trackColor:var(--trackColor-synth);">
-                <div id="Synth_0"></div><div id="Synth_1"></div><div id="Synth_2"></div><div id="Synth_3"></div><div id="Synth_4"></div><div id="Synth_5"></div><div id="Synth_6"></div><div id="Synth_7"></div><div id="Synth_8"></div><div id="Synth_9"></div><div id="Synth_10"></div><div id="Synth_11"></div><div id="Synth_12"></div><div id="Synth_13"></div><div id="Synth_14"></div><div id="Synth_15"></div>
+            <div id="br_synth" class="beet-row" style="--beetSize:20%; --trackColor:var(--trackColor-synth);">
+                <div id="Synth_0"></div><div id="Synth_1"></div><div id="Synth_2"></div><div id="Synth_3"></div><div id="Synth_4"></div><div id="Synth_5"></div><div id="Synth_6"></div><div id="Synth_7"></div><div id="Synth_8"></div><div id="Synth_9"></div><div id="Synth_10"></div><div id="Synth_11"></div><div id="Synth_12"></div><div id="Synth_13"></div><div id="Synth_14"></div><div id="Synth_15"></div><div id="Synth_16"></div><div id="Synth_17"></div><div id="Synth_18"></div><div id="Synth_19"></div><div id="Synth_20"></div><div id="Synth_21"></div><div id="Synth_22"></div><div id="Synth_23"></div><div id="Synth_24"></div><div id="Synth_25"></div><div id="Synth_26"></div><div id="Synth_27"></div><div id="Synth_28"></div><div id="Synth_29"></div><div id="Synth_30"></div><div id="Synth_31"></div>
             </div>
 
 

@@ -1,20 +1,29 @@
-// Events
+// MASTER TODO:
+// organic samples for snyth and bass
+// Sampling Page
+
+
 // init() once the page has finished loading.
 window.onload = init;
-var instruments = ['Kick', 'Snare', 'HiHat', 'Brass', 'Synth'];
-var loopLength = 16;
+var instruments = ['Kick', 'Snare', 'HiHat', 'Bass', 'Synth'];
+var loopLength = 32;
+let playing = false;
 
 // have to update TRACK CONTROLS UI in index if these are changed
 const initial_style = "boombap"
 const initial_organic = false // false = generic, true = organic
 const initial_complexity = 1
 const initial_volume = .8
+const track_gain_adjust = [ 1.0 , 0.9 , 0.6 , 0.6 , 0.6 ]
 
 var track_style = [initial_style,initial_style,initial_style,initial_style,initial_style];
 var track_organic = [initial_organic,initial_organic,initial_organic,initial_organic,initial_organic]; 
 var track_complexity = [initial_complexity,initial_complexity,initial_complexity,initial_complexity,initial_complexity];
 var track_volume = [initial_volume,initial_volume,initial_volume,initial_volume,initial_volume];
 var instrumentActive = [true,true,true,true,true]
+
+var customBassPitch = .5
+var customSynthPitch = .5
 
 var startAlertAlive = true;
 
@@ -43,17 +52,24 @@ var kMaxSwing = .08;
 
 var currentKit;
 
-var beatReset = {"effectIndex":0,"tempo":100,"swingFactor":0,"effectMix":0.25,"kickPitchVal":0.5,"snarePitchVal":0.5,"hihatPitchVal":0.5,"brassPitchVal":0.5,"synthPitchVal":0.5,"rhythm1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm2":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm4":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm5":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],};
+const swingLength = 4
+
+var beatReset = {"effectIndex":0,"tempo":100,"swingFactor":0,"effectMix":0.25,"kickPitchVal":0.5,"snarePitchVal":0.5,"hihatPitchVal":0.5,"bassPitchVal":0.5,"synthPitchVal":0.5,"rhythm1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm2":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm4":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rhythm5":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"pitches4":[0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],"pitches5":[0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],};
 var beatDemo = [
-    {"effectIndex":11,"tempo":120,"swingFactor":0,"effectMix":0.19718309859154926,
-        "kickPitchVal":0.5,"snarePitchVal":0.5,"hihatPitchVal":0.5,"brassPitchVal":0.5,"synthPitchVal":0.5,
+    {"effectIndex":11,"tempo":90,"swingFactor":0,"effectMix":0.19718309859154926,
+        "kickPitchVal":0.5,"snarePitchVal":0.5,"hihatPitchVal":0.5,"bassPitchVal":0.5,"synthPitchVal":0.5,
         "rhythm1": window.parseRawRhythm(window.PATTERNLIB["kick"][initial_style][initial_complexity-1]),
         "rhythm2":window.parseRawRhythm(window.PATTERNLIB["snare"][initial_style][initial_complexity-1]),
         "rhythm3":window.parseRawRhythm(window.PATTERNLIB["hihat"][initial_style][initial_complexity-1]),
-        "rhythm4":window.parseRawRhythm(window.PATTERNLIB["brass"][initial_style][initial_complexity-1]),
-        "rhythm5":window.parseRawRhythm(window.PATTERNLIB["synth"][initial_style][initial_complexity-1]),
+        "rhythm4":window.parseRawRhythm(window.PATTERNLIB["bass"][initial_style][initial_complexity-1], pitched=true),
+        "rhythm5":window.parseRawRhythm(window.PATTERNLIB["synth"][initial_style][initial_complexity-1], pitched=true),
+
+        "pitches4":window.parseRawPitches(window.PATTERNLIB["bass"][initial_style][initial_complexity-1]),
+        "pitches5":window.parseRawPitches(window.PATTERNLIB["synth"][initial_style][initial_complexity-1]),
     },
 ];
+
+
 
 function cloneBeat(source) {
     var beat = new Object();
@@ -65,14 +81,16 @@ function cloneBeat(source) {
     beat.kickPitchVal = source.kickPitchVal;
     beat.snarePitchVal = source.snarePitchVal;
     beat.hihatPitchVal = source.hihatPitchVal;
-    beat.brassPitchVal = source.brassPitchVal;
+    beat.bassPitchVal = source.bassPitchVal;
     beat.synthPitchVal = source.synthPitchVal;
     beat.rhythm1 = source.rhythm1.slice(0);        // slice(0) is an easy way to copy the full array
     beat.rhythm2 = source.rhythm2.slice(0);
     beat.rhythm3 = source.rhythm3.slice(0);
     beat.rhythm4 = source.rhythm4.slice(0);
     beat.rhythm5 = source.rhythm5.slice(0);
-    
+    beat.pitches4 = source.pitches4.slice(0);
+    beat.pitches5 = source.pitches5.slice(0);
+
     return beat;
 }
 
@@ -80,14 +98,14 @@ function cloneBeat(source) {
 // ... it is saved/loaded via JSON
 var theBeat = cloneBeat(beatReset);
 
-kickPitch = snarePitch = hihatPitch = brassPitch = synthPitch = 0;
+kickPitch = snarePitch = hihatPitch = bassPitch = synthPitch = 0;
 
 var mouseCapture = null;
 var mouseCaptureOffset = 0;
 
 var rhythmIndex = 0;
-var kMinTempo = 53;
-var kMaxTempo = 180;
+var kMinTempo = 40;
+var kMaxTempo = 150;
 var noteTime = 0.0;
 
 
@@ -157,6 +175,8 @@ function Kit(name) {
     this.kickBuffer = 0;
     this.snareBuffer = 0;
     this.hihatBuffer = 0;
+    this.bassBuffer = 0;
+    this.synthBuffer = 0;
 
     this.instrumentCount = kNumInstruments;
     this.instrumentLoadCount = 0;
@@ -182,13 +202,13 @@ Kit.prototype.load = function() {
     var kickPath = pathName + "kick.wav";
     var snarePath = pathName + "snare.wav";
     var hihatPath = pathName + "hihat.wav";
-    var brassPath = pathName + "brass.wav";
+    var bassPath = pathName + "bass.wav";
     var synthPath = pathName + "synth.wav";
 
     this.loadSample(0, kickPath, false);
     this.loadSample(1, snarePath, false);
     this.loadSample(2, hihatPath, false);  // we're panning only the hihat / d: JK
-    this.loadSample(3, brassPath, false);
+    this.loadSample(3, bassPath, false);
     this.loadSample(4, synthPath, false);
 }
 
@@ -196,7 +216,7 @@ var decodedFunctions = [
 function (buffer) { this.kickBuffer = buffer; },
 function (buffer) { this.snareBuffer = buffer; },
 function (buffer) { this.hihatBuffer = buffer; },
-function (buffer) { this.brassBuffer = buffer; },
+function (buffer) { this.bassBuffer = buffer; },
 function (buffer) { this.synthBuffer = buffer; }, ];
 
 Kit.prototype.loadSample = function(sampleID, url, mixToMono) {
@@ -342,10 +362,6 @@ function startLoadingAssets() {
         impulseResponseList[i].load();
     }
     
-    // Setup initial drumkit
-    // currentKit = kits[kInitialKitIndex];
-    //TODO:set initial sample mappings?
-
 }
 
 function demoButtonURL(demoIndex) {
@@ -552,14 +568,21 @@ function advanceNote() {
     }
 
         // apply swing    
-    if (rhythmIndex % 2) {
+    if (rhythmIndex % swingLength) {
         noteTime += (0.25 + kMaxSwing * theBeat.swingFactor) * secondsPerBeat;
-    } else {
+    } else if ((rhythmIndex + 15) % swingLength) {
         noteTime += (0.25 - kMaxSwing * theBeat.swingFactor) * secondsPerBeat;
     }
 }
 
-function playNote(buffer, pan, x, y, z, sendGain, mainGain, playbackRate, noteTime) {
+let last_synth_gain = false;
+let last_synth_note = false;
+let last_bass_gain = false;
+let last_bass_note = false;
+
+function playNote(buffer, pan, x, y, z, sendGain, mainGain, playbackRate, noteTime, choke) {
+    // diego: added synth_choke to cutoff previous synth note if still playing when next one starts
+    
     // Create the note
     var voice = context.createBufferSource();
     voice.buffer = buffer;
@@ -590,7 +613,34 @@ function playNote(buffer, pan, x, y, z, sendGain, mainGain, playbackRate, noteTi
     finalNode.connect(wetGainNode);
     wetGainNode.connect(convolver);
 
+
+    if (choke == "synth") {
+        chokeNote("synth")
+        last_synth_gain = dryGainNode
+        last_synth_note = voice
+    } else if (choke == "bass") {
+        chokeNote("bass")
+        last_bass_gain = dryGainNode
+        last_bass_note = voice
+    }
+
     voice.start(noteTime);
+}
+function chokeNote(track) {
+    const currentTime = context.currentTime;
+
+    if (track == "synth" && last_synth_note) {
+        const fadeTime = 0.08;
+        last_synth_gain.gain.setValueAtTime(last_synth_gain.gain.value, currentTime); // Set current gain
+        last_synth_gain.gain.linearRampToValueAtTime(0, currentTime + fadeTime ); // fadeTime = .2
+        last_synth_note.stop(currentTime + fadeTime); // Stop after fade-out
+    }
+    else if (track == "bass" && last_bass_note) {
+        const fadeTime = 0.16;
+        last_bass_gain.gain.setValueAtTime(last_bass_gain.gain.value, currentTime); // Set current gain
+        last_bass_gain.gain.linearRampToValueAtTime(0, currentTime + fadeTime ); // fadeTime = .2
+        last_bass_note.stop(currentTime + fadeTime); // Stop after fade-out
+    }
 }
 
 function schedule() {
@@ -607,62 +657,43 @@ function schedule() {
         
         // Kick
         if (theBeat.rhythm1[rhythmIndex] && instrumentActive[0]) {
-            playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5, track_volume[0] * 1.0, kickPitch, contextPlayTime);
+            playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5, track_volume[0] * track_gain_adjust[0], kickPitch, contextPlayTime);
         }
 
         // Snare
         if (theBeat.rhythm2[rhythmIndex] && instrumentActive[1]) {
-            playNote(currentKit.snareBuffer, false, 0,0,-2, .5, track_volume[1] * 1.0, snarePitch, contextPlayTime);
+            playNote(currentKit.snareBuffer, false, 0,0,-2, .5, track_volume[1] * track_gain_adjust[1], snarePitch, contextPlayTime);
         }
 
         // Hihat
         if (theBeat.rhythm3[rhythmIndex] && instrumentActive[2]) {
             // Pan the hihat according to sequence position.
-            playNote(currentKit.hihatBuffer, true, 0,0,-2, .5, track_volume[2] * 1.0, hihatPitch, contextPlayTime);
+            playNote(currentKit.hihatBuffer, true, 0,0,-2, .5, track_volume[2] * track_gain_adjust[2], hihatPitch, contextPlayTime);
         }
 
-        // Toms    
+        // Bass
         if (theBeat.rhythm4[rhythmIndex] && instrumentActive[3]) {
-            playNote(currentKit.brass, false, 0,0,-2, .5, track_volume[3] * 1.0, brassPitch, contextPlayTime);
+            bassPitch = theBeat.pitches4[rhythmIndex]
+            playNote(currentKit.bassBuffer, false, 0,0,-2, .5, track_volume[3] * track_gain_adjust[3], bassPitch, contextPlayTime, choke="bass");
         }
 
+        // Synth
         if (theBeat.rhythm5[rhythmIndex] && instrumentActive[4]) {
-            playNote(currentKit.synth, false, 0,0,-2, .5, track_volume[4] * 1.0, synthPitch, contextPlayTime);
+            synthPitch = theBeat.pitches5[rhythmIndex]
+            playNote(currentKit.synthBuffer, false, 0,0,-2, .5, track_volume[4] * track_gain_adjust[4], synthPitch, contextPlayTime, choke="synth");
         }
 
         
         // Attempt to synchronize drawing time with sound
         if (noteTime != lastDrawTime) {
             lastDrawTime = noteTime;
-            drawPlayhead((rhythmIndex + 15) % 16);
+            drawPlayhead((rhythmIndex + (loopLength-1)) % loopLength);
         }
 
         advanceNote();
     }
 }
 
-function playDrum(noteNumber, velocity) {
-
-    switch (noteNumber) {
-        case 0x24:
-            playNote(currentKit.kickBuffer,  false, 0,0,-2,  0.5, (velocity / 127), kickPitch,  0);
-            break;
-        case 0x26:
-            playNote(currentKit.snareBuffer, false, 0,0,-2,  1,   (velocity / 127), snarePitch, 0);
-            break;
-        case 0x28:
-            playNote(currentKit.hihatBuffer, true,  0,0,-1.0,1,   (velocity / 127), hihatPitch, 0);
-            break;
-        case 0x2d:
-            playNote(currentKit.brass,        false, 0,0,-2,  1,   (velocity / 127), brassPitch,  0);
-            break;
-        case 0x2f:
-            playNote(currentKit.synth,        false, 0,0,-2,  1,   (velocity / 127), synthPitch,  0);
-            break;
-        default:
-            console.log("note:0x" + noteNumber.toString(16) );
-    }
-}
 
 function handleSliderMouseDown(event) {
     mouseCapture = event.target.id;
@@ -751,9 +782,9 @@ function sliderSetValue(slider, value) {
         theBeat.hihatPitchVal = value;
         hihatPitch = pitchRate;
         break;
-    case 'brass_thumb':
-        theBeat.brassPitchVal = value;
-        brassPitch = pitchRate;
+    case 'bass_thumb':
+        theBeat.bassPitchVal = value;
+        bassPitch = pitchRate;
         break;
     case 'synth_thumb':
         theBeat.synthPitchVal = value;
@@ -796,23 +827,23 @@ function handleButtonMouseDown(event) {
     if (note) {
         switch(instrumentIndex) {
         case 0:  // Kick
-          playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5 * theBeat.effectMix, track_volume[0] * 1.0, kickPitch, 0);
+          playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5 * theBeat.effectMix, track_volume[0] * track_gain_adjust[0], kickPitch, 0);
           break;
 
         case 1:  // Snare
-          playNote(currentKit.snareBuffer, false, 0,0,-2, theBeat.effectMix, track_volume[1] * 0.6, snarePitch, 0);
+          playNote(currentKit.snareBuffer, false, 0,0,-2, theBeat.effectMix, track_volume[1] * track_gain_adjust[1], snarePitch, 0);
           break;
 
         case 2:  // Hihat
-          playNote(currentKit.hihatBuffer, true, 0.5*rhythmIndex - 4, 0, -1.0, theBeat.effectMix, track_volume[2] * 0.7, hihatPitch, 0);
+          playNote(currentKit.hihatBuffer, true, 0.5*rhythmIndex - 4, 0, -1.0, theBeat.effectMix, track_volume[2] * track_gain_adjust[2], hihatPitch, 0);
           break;
 
         case 3:  // Tom 1   
-          playNote(currentKit.brass, false, 0,0,-2, theBeat.effectMix, track_volume[3] * 0.6, brassPitch, 0);
+          playNote(currentKit.bassBuffer, false, 0,0,-2, theBeat.effectMix, track_volume[3] * track_gain_adjust[3], bassPitch, 0, choke="bass");
           break;
 
         case 4:  // Tom 2   
-          playNote(currentKit.synth, false, 0,0,-2, theBeat.effectMix, track_volume[4] * 0.6, synthPitch, 0);
+          playNote(currentKit.synthBuffer, false, 0,0,-2, theBeat.effectMix, track_volume[4] * track_gain_adjust[4], synthPitch, 0, choke="synth");
           break;
         }
     }
@@ -934,6 +965,8 @@ function handleDemoMouseDown(event) {
 }
 
 function handlePlay(event) {
+    playing = true
+
     if (startAlertAlive) {
         removeStartAlert()
     }
@@ -959,12 +992,14 @@ function removeStartAlert() {
 }
 
 function handleStop(event) {
+    playing = false
+
     timerWorker.postMessage("stop");
 
     // var elOld = document.getElementById('LED_' + (rhythmIndex + 14) % 16);
     // elOld.src = 'images/LED_off.png';
 
-    hideBeat( (rhythmIndex + 14) % 16 );
+    hideBeat( (rhythmIndex + (loopLength - 2)) % loopLength );
 
     rhythmIndex = 0;
 
@@ -976,6 +1011,13 @@ function handleStop(event) {
         // turn off the stop button
         midiOut.send( [0x80, 7, 1] );
     }
+
+    chokeNote("synth")
+    last_synth_gain = false
+    last_synth_note = false
+    chokeNote("bass")
+    last_bass_gain = false
+    last_bass_note = false
 }
 
 
@@ -1009,7 +1051,7 @@ function loadBeat(beat) {
     sliderSetValue('kick_thumb', theBeat.kickPitchVal);
     sliderSetValue('snare_thumb', theBeat.snarePitchVal);
     sliderSetValue('hihat_thumb', theBeat.hihatPitchVal);
-    sliderSetValue('brass_thumb', theBeat.brassPitchVal);
+    sliderSetValue('bass_thumb', theBeat.bassPitchVal);
     sliderSetValue('synth_thumb', theBeat.synthPitchVal);
 
     sliderSetValue('swing_thumb', theBeat.swingFactor);
@@ -1062,7 +1104,7 @@ function drawActiveNote(beet, tk_idx) {
 }
 
 function drawPlayhead(xindex) {
-    var lastIndex = (xindex + 15) % 16;
+    var lastIndex = (xindex + (loopLength - 1)) % loopLength;
 
     // var elNew = document.getElementById('LED_' + xindex);
     // var elOld = document.getElementById('LED_' + lastIndex);
@@ -1164,7 +1206,7 @@ window.onclick = function(event) {
         if (dropdown.classList.contains('show')) {dropdown.classList.remove('show');}
         dropdown = document.getElementById("dropdownMenu_hihat");
         if (dropdown.classList.contains('show')) {dropdown.classList.remove('show');}
-        dropdown = document.getElementById("dropdownMenu_brass");
+        dropdown = document.getElementById("dropdownMenu_bass");
         if (dropdown.classList.contains('show')) {dropdown.classList.remove('show');}
         dropdown = document.getElementById("dropdownMenu_synth");
         if (dropdown.classList.contains('show')) {dropdown.classList.remove('show');}
@@ -1217,11 +1259,12 @@ function handleMasterVolChange(val) {
     masterGainNode.gain.value = (val / 100).toFixed(2); // reduce overall volume to avoid clipping
 }
 
+const track_names = ["kick", "snare", "hihat", "bass", "synth"]
 const track2idx = {
     "kick":0,
     "snare":1,
     "hihat":2,
-    "brass":3,
+    "bass":3,
     "synth":4,
 }
 function handleTrackVolumeChange(track, val) {
@@ -1242,13 +1285,29 @@ function handleMuteBtn(track) {
     img.src = "img/btn_track"+state+".png";
 
     let tk_idx = track2idx[track]
-    let cb = document.getElementById("cb_"+track);
+    let cb = document.getElementById("cb_"+track); // control box
+    let br = document.getElementById("br_"+track); // beet row
     if (state == "muted") {
+        console.log(cb)
         cb.style.setProperty('--trackColor', 'var(--c-cream2)')
+        br.style.setProperty('--trackColor', 'var(--c-brown)')
         instrumentActive[tk_idx] = false
     } else {
         cb.style.setProperty('--trackColor', 'var(--trackColor-'+track+')') 
+        br.style.setProperty('--trackColor', 'var(--trackColor-'+track+')') 
         instrumentActive[tk_idx] = true
+    }
+
+
+    if (track == "synth") {
+        chokeNote("synth")
+        last_synth_gain = false
+        last_synth_note = false
+    } 
+    else if (track == "bass") {
+        chokeNote("bass")
+        last_bass_gain = false
+        last_bass_note = false
     }
 }
 
@@ -1262,7 +1321,9 @@ function updatePattern(track,stylecode,complexity) {
 
     // let new_rhythm = [1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0] //leftoff
     let rhythm_raw = window.PATTERNLIB[track][stylecode][complexity - 1]
-    let new_rhythm = window.parseRawRhythm(rhythm_raw)
+
+    let pitched = track == "synth" || track == "bass"
+    let new_rhythm = window.parseRawRhythm(rhythm_raw, pitched)
     
     switch (tk_idx) {
         case 0: theBeat.rhythm1 = new_rhythm; break;
@@ -1272,6 +1333,15 @@ function updatePattern(track,stylecode,complexity) {
         case 4: theBeat.rhythm5 = new_rhythm; break;
     }
     redrawRow(tk_idx) // tk_idx
+    
+    if (tk_idx >= 3) {
+        let new_pitches = window.parseRawPitches(rhythm_raw)
+
+        switch (tk_idx) {
+            case 3: theBeat.pitches4 = new_pitches; break;
+            case 4: theBeat.pitches5 = new_pitches; break;
+        }
+    }
 }
 
 function handleComplexityChange(track, val) {
@@ -1308,7 +1378,7 @@ function redrawRow(track_idx) {
 //     beat.kickPitchVal = source.kickPitchVal;
 //     beat.snarePitchVal = source.snarePitchVal;
 //     beat.hihatPitchVal = source.hihatPitchVal;
-//     beat.brassPitchVal = source.brassPitchVal;
+//     beat.bassPitchVal = source.bassPitchVal;
 //     beat.synthPitchVal = source.synthPitchVal;
 //     beat.rhythm1 = source.rhythm1.slice(0);        // slice(0) is an easy way to copy the full array
 //     beat.rhythm2 = source.rhythm2.slice(0);
@@ -1349,6 +1419,7 @@ function customKit(track,style,organic) {
     if (organic){
         replaceBuffer =  instSamples[style2idx["organic"]][replace_name]
     } else {
+        // CHANGE PITCH HERE
         replaceBuffer =  instSamples[style2idx[style]][replace_name]
     }
 
@@ -1373,8 +1444,8 @@ function InstrumentSamples(name) {
     this.kickBuffer = 0;
     this.snareBuffer = 0;
     this.hihatBuffer = 0;
-    this.brassBuffer = 0;
-    this.hihatBuffer = 0;
+    this.bassBuffer = 0;
+    this.synthBuffer = 0;
 
     this.instrumentCount = kNumInstruments;
     this.instrumentLoadCount = 0;
@@ -1400,13 +1471,13 @@ InstrumentSamples.prototype.load = function() {
     var kickPath = pathName + "kick.wav";
     var snarePath = pathName + "snare.wav";
     var hihatPath = pathName + "hihat.wav";
-    var brassPath = pathName + "brass.wav";
+    var bassPath = pathName + "bass.wav";
     var synthPath = pathName + "synth.wav";
 
     this.loadSample(0, kickPath, false);
     this.loadSample(1, snarePath, false);
     this.loadSample(2, hihatPath, false);
-    this.loadSample(3, brassPath, false);
+    this.loadSample(3, bassPath, false);
     this.loadSample(4, synthPath, false);
 }
 
@@ -1447,3 +1518,44 @@ function handleInfo(showInfo) {
         document.getElementById('info_overlay').classList.add('fadeOut');
     }
 }
+
+
+
+// Listen for spacebar keypress
+document.addEventListener("keydown", (event) => {
+    if (event.code === "Space") {
+        event.preventDefault(); // Prevent scrolling when pressing space
+        if (playing) {handleStop()} 
+        else {handlePlay()}      
+    }
+
+    else if (/^Digit[1-5]$/.test(event.code)) {
+        let digit = event.code.slice(-1) - 1 // subtract 1 for 0-indexing
+        let track_name = track_names[ digit ]
+        handleMuteBtn(track_name)
+    }
+
+    // DRUM SHOTS
+    else if (/^[QWEqwe]$/.test(event.key)) {
+        let letter = event.key.toUpperCase()
+        window.shift2rateCmaj
+        switch (letter) {
+            case "Q": playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5, track_volume[0] * track_gain_adjust[0], kickPitch, context.currentTime); break;
+            case "W": playNote(currentKit.snareBuffer, false, 0,0,-2, 0.5, track_volume[1] * track_gain_adjust[1], snarePitch, context.currentTime); break;
+            case "E": playNote(currentKit.hihatBuffer, false, 0,0,-2, 0.5, track_volume[2] * track_gain_adjust[2], hihatPitch, context.currentTime); break;
+        }
+    }
+
+    // MELODIC KEYBOARDS /////////
+
+    // BASS
+    // else if (/^[QWERTYUIOP[qwertyuiop]$/.test(event.key)) {
+    //     let letter = event.key.toUpperCase()
+    //     window.shift2rateCmaj
+    //     switch (letter) {
+    //         case "Z": playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5, track_volume[0] * track_gain_adjust[0], kickPitch, context.currentTime); break;
+    //     }
+
+    //     playNote(currentKit.kickBuffer, false, 0,0,-2, 0.5, track_volume[0] * track_gain_adjust[0], kickPitch, context.currentTime); break;
+    // }
+});

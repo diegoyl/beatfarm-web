@@ -18,7 +18,7 @@
 	--trackColor-kick: rgb(191, 4, 137);
 	--trackColor-snare: rgb(250, 32, 148);
 	--trackColor-hihat: rgb(255, 82, 105);
-	--trackColor-brass: rgb(59 ,196 ,157 );
+	--trackColor-bass: rgb(59 ,196 ,157 );
 	--trackColor-synth: rgb(19 ,172 ,186 );
 
 	--gui-width: 900px;
@@ -53,6 +53,8 @@
 	height: 40px;
 	box-shadow: 0 0px 15px rgba(41, 35, 31, 0.387);
 	border-radius: 5px;
+	z-index: 50;
+
 }
 .info_overlay {
 	position: fixed;
@@ -80,19 +82,39 @@
 	text-align: center;
 	padding: 0 25px;
 
+
+	overflow-y: scroll;
 }
 #info_content p, #info_content h2 {
 	margin: 10px;
 }
-#info_x {
+.info_x {
 	position: absolute;
 	top: 6px;
 	right: 12px;
 	font-size: 34px;
-	font-family: Arial;
+	/* font-family: Arial; */
 	font-weight: bold;
+	background-color: var(--c-brown);
+	color: var(--c-cream);
+	border-radius: 5px;
+	width: 42px;
+	height: 42px;
+	line-height: 50px;
 }
+#info_content .info_x2 {
+	/* font-family: Pangram; */
+	font-weight: normal;
+	letter-spacing: .05em;
+	
+	display: block;
+	position:relative;
 
+	width: min-content;
+	padding: 5px 25px;
+
+	margin: 0 auto;
+}
 
 
 .startAlert {
@@ -842,9 +864,9 @@ input[type="radio"]:checked {
 	border-radius: 100px;
 }
 .beet-row div {
-	height: 24px;
-	width: 24px;
-	margin: 3px;
+	height: 20px;
+	width: 20px;
+	margin: 3px 1px;
 
 	/* outline: yellow dashed .5px; */
     position: relative;
@@ -887,7 +909,7 @@ input[type="radio"]:checked {
 	top: 0;
 	transform: translateX(60%); /* THIS DOESNT CHANGE */
 
-	left: calc(var(--leftPos) * 6.33%); /* THIS CHANGES EACH BEAT */
+	left: calc(var(--leftPos) * 3.09%); /* THIS CHANGES EACH BEAT */
 	/* transition: 10ms linear; */
 }
 
@@ -911,20 +933,47 @@ input[type="radio"]:checked {
 }
 
 #mobileWarning {
-	width: 100%;
 	text-align: center;
-	margin: 50px auto;
-	color: red;
+	color: rgb(255, 0, 0);
 	display: none;
+	background-color: rgba(73, 13, 13, 0.83);
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+	left: 0;
+	z-index: 99;
 }
 #mobileWarning h1{
-	margin: 0 auto;
-	font-size: 40px;
+	margin: 22vh auto 0;
+	font-size: 12vw;
+	width: 80%;
 }
 #mobileWarning h2{
-	margin: 0 auto;
-	font-size: 20px;
+	margin: 5vw auto 0 ;
+	font-size: 6vw;
+	width: 60%;
 }
+
+#info_content .key {
+	display: inline-block;
+	background-color: var(--c-brown);
+	color: var(--c-cream);
+	/* padding: 5px; */
+	width: 24px;
+	height: 22px;
+	margin: 3px 0;
+	line-height: 25px;
+	border-radius: 2px;
+	text-align: center;
+}
+#info_content .txt {
+	margin-left: 10px;
+}
+#info_content .space {
+	width: 60px;
+}
+
 
 @media screen and (max-width: 768px) {
 	#mobileWarning {

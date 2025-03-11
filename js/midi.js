@@ -90,90 +90,90 @@ function changeMIDIOut( ev ) {
   }
 }
 
-function onMIDIInit( midi ) {
-  midiAccess = midi;
-  selectMIDIIn=document.getElementById("midiIn");
-  selectMIDIOut=document.getElementById("midiOut");
+// function onMIDIInit( midi ) {
+//   midiAccess = midi;
+//   selectMIDIIn=document.getElementById("midiIn");
+//   selectMIDIOut=document.getElementById("midiOut");
   
-  // clear the MIDI input select
-  selectMIDIIn.options.length = 0;
-  selectMIDIOut.options.length = 0;
+//   // clear the MIDI input select
+//   selectMIDIIn.options.length = 0;
+//   selectMIDIOut.options.length = 0;
 
-  if ((typeof(midiAccess.inputs) == "function")) {  //Old Skool MIDI inputs() code
-    var list=midiAccess.inputs();
+//   if ((typeof(midiAccess.inputs) == "function")) {  //Old Skool MIDI inputs() code
+//     var list=midiAccess.inputs();
 
-    for (var i=0; i<list.length; i++) {
-      var str=list[i].name.toString();
-      if (!midiIn && (str.indexOf("Controls") != -1)) {
-        selectMIDIIn.appendChild(new Option(list[i].name,list[i].id,true,true));
-        midiIn = list[i];
-      } else
-        selectMIDIIn.appendChild(new Option(list[i].name,list[i].id,false,false));
-    }
-    if (!midiIn)
-      midiIn = list[0];
-    if (midiIn)
-      midiIn.onmidimessage = midiMessageReceived;
+//     for (var i=0; i<list.length; i++) {
+//       var str=list[i].name.toString();
+//       if (!midiIn && (str.indexOf("Controls") != -1)) {
+//         selectMIDIIn.appendChild(new Option(list[i].name,list[i].id,true,true));
+//         midiIn = list[i];
+//       } else
+//         selectMIDIIn.appendChild(new Option(list[i].name,list[i].id,false,false));
+//     }
+//     if (!midiIn)
+//       midiIn = list[0];
+//     if (midiIn)
+//       midiIn.onmidimessage = midiMessageReceived;
 
-    list=midiAccess.outputs();
+//     list=midiAccess.outputs();
 
-    for (var i=0; i<list.length; i++) {
-      var str=list[i].name.toString();
-      if (!midiOut && (str.indexOf("Controls") != -1)) {
-        selectMIDIOut.appendChild(new Option(list[i].name,list[i].id,true,true));
-        midiOut = list[i];
-      } else
-        selectMIDIOut.appendChild(new Option(list[i].name,list[i].id,false,false));
-    }
-    if (!midiOut)
-      midiOut = list[0];
-  } else {  // new MIDIMap implementation:
-    var inputs=midiAccess.inputs.values();
-    for ( var input = inputs.next(); input && !input.done; input = inputs.next()) {
-      input = input.value;
-      var str=input.name.toString();
-      var preferred = !midiIn && (str.indexOf("Controls") != -1);
+//     for (var i=0; i<list.length; i++) {
+//       var str=list[i].name.toString();
+//       if (!midiOut && (str.indexOf("Controls") != -1)) {
+//         selectMIDIOut.appendChild(new Option(list[i].name,list[i].id,true,true));
+//         midiOut = list[i];
+//       } else
+//         selectMIDIOut.appendChild(new Option(list[i].name,list[i].id,false,false));
+//     }
+//     if (!midiOut)
+//       midiOut = list[0];
+//   } else {  // new MIDIMap implementation:
+//     var inputs=midiAccess.inputs.values();
+//     for ( var input = inputs.next(); input && !input.done; input = inputs.next()) {
+//       input = input.value;
+//       var str=input.name.toString();
+//       var preferred = !midiIn && (str.indexOf("Controls") != -1);
 
-      selectMIDIIn.appendChild(new Option(input.name,input.id,preferred,preferred));
-      if (preferred) {
-        midiIn = input;
-        midiIn.onmidimessage = midiMessageReceived;
-      }
-    }
-    if (!midiIn) {
-      midiIn = midiAccess.inputs.values().next().value;
-      if (midiIn)
-        midiIn.onmidimessage = midiMessageReceived;
-    }
+//       selectMIDIIn.appendChild(new Option(input.name,input.id,preferred,preferred));
+//       if (preferred) {
+//         midiIn = input;
+//         midiIn.onmidimessage = midiMessageReceived;
+//       }
+//     }
+//     if (!midiIn) {
+//       midiIn = midiAccess.inputs.values().next().value;
+//       if (midiIn)
+//         midiIn.onmidimessage = midiMessageReceived;
+//     }
 
-    var outputs=midiAccess.outputs.values();
-    for ( var output = outputs.next(); output && !output.done; output = outputs.next()) {
-      output = output.value;
-      var str=output.name.toString();
-      var preferred = !midiOut && (str.indexOf("Controls") != -1);
+//     var outputs=midiAccess.outputs.values();
+//     for ( var output = outputs.next(); output && !output.done; output = outputs.next()) {
+//       output = output.value;
+//       var str=output.name.toString();
+//       var preferred = !midiOut && (str.indexOf("Controls") != -1);
 
-      selectMIDIOut.appendChild(new Option(output.name,output.id,preferred,preferred));
-      if (preferred) {
-        midiOut = output;
-        outputIsLivid = true;
-      }
-    }
-    if (!midiOut)
-      midiOut = midiAccess.outputs.values().next().value;
-  }
-  selectMIDIIn.onchange = changeMIDIIn;
-  selectMIDIOut.onchange = changeMIDIOut;
+//       selectMIDIOut.appendChild(new Option(output.name,output.id,preferred,preferred));
+//       if (preferred) {
+//         midiOut = output;
+//         outputIsLivid = true;
+//       }
+//     }
+//     if (!midiOut)
+//       midiOut = midiAccess.outputs.values().next().value;
+//   }
+//   selectMIDIIn.onchange = changeMIDIIn;
+//   selectMIDIOut.onchange = changeMIDIOut;
   
-  setActiveInstrument( 0 );
-  updateActiveInstruments();
+//   setActiveInstrument( 0 );
+//   updateActiveInstruments();
 
-  if (outputIsLivid) {
-    // light up the play button
-    midiOut.send( [0x90, 3, 32] );
-    // turn off the stop button
-    midiOut.send( [0x80, 7, 1] );
-  }
-}
+//   if (outputIsLivid) {
+//     // light up the play button
+//     midiOut.send( [0x90, 3, 32] );
+//     // turn off the stop button
+//     midiOut.send( [0x80, 7, 1] );
+//   }
+// }
 
 function showBeat(index) {
   if (midiOut && outputIsLivid)
@@ -190,9 +190,9 @@ function onMIDISystemError( msg ) {
   console.log( "Error encountered:" + msg );
 }
 //init: start up MIDI
-window.addEventListener('load', function() {   
-  navigator.requestMIDIAccess().then( onMIDIInit, onMIDISystemError );
-});
+// window.addEventListener('load', function() {   
+//   navigator.requestMIDIAccess().then( onMIDIInit, onMIDISystemError );
+// });
 
 var currentlyActiveInstrument = 0;
 
